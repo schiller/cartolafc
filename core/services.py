@@ -31,6 +31,19 @@ class CartolafcAPIClient():
         """Handle a persistent connection error or timeout"""
         pass
 
+    def login(self, email, password):
+        url = 'https://login.globo.com/api/authentication'
+        data = {
+            "payload": {
+                "email": email,
+                "password": password,
+                "serviceId": 4728
+            },
+            "captcha": ""
+        }
+        r = requests.post(url=url, json=data)
+        return r.json()['glbId']
+
     def clubes(self):
         url = '{}clubes'.format(self.base_url)
         response = self._get(url)

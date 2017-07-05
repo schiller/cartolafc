@@ -168,6 +168,30 @@ class ServicesTests(TestCase):
         # Make sure our HTTP error handler is called
         mock_http_error_handler.assert_called_once_with(http_error)
 
+    @mock.patch('core.services.requests.post')
+    def test_login(self, mock_post):
+        email = 'spam'
+        password = 'eggs'
+        url = 'https://login.globo.com/api/authentication'
+        data = {
+            "payload": {
+                "email": email,
+                "password": password,
+                "serviceId": 4728
+            },
+            "captcha": ""
+        }
+        expected_return = 'spam eggs'
+        mock_response = mock.Mock()
+        mock_response.json.return_value = {'glbId': expected_return}
+        mock_post.return_value = mock_response
+
+        return_value = self.client.login(email, password)
+
+        mock_post.assert_called_once_with(url=url, json=data)
+        self.assertEqual(1, mock_response.json.call_count)
+        self.assertEqual(return_value, expected_return)
+
     @mock.patch('core.services.CartolafcAPIClient._get')
     def test_clubes(self, mock_get):
         """
@@ -206,6 +230,92 @@ class ServicesTests(TestCase):
         mock_get.assert_called_once_with(expected_url)
         self.assertEqual(1, mock_get.call_count)
         self.assertEqual(output, expected_output)
+
+    # @mock.patch('core.services.CartolafcAPIClient._get')
+    # def test_mercado(self, mock_get):
+    #     """
+    #     Test getting a list of Jogador from the mercado method of
+    #     CartolafcAPIClient.
+    #     """
+    #     expected_response = {
+    #         "atletas":[
+    #             {
+    #                 "nome":"Thiago Neves Augusto",
+    #                 "apelido":"Thiago Neves",
+    #                 "foto":"https://s.glbimg.com/es/sde/f/2017/02/19/6bb6e70216d205ad23e44268eba27692_FORMATO.png",
+    #                 "atleta_id":38277,
+    #                 "rodada_id":11,
+    #                 "clube_id":283,
+    #                 "posicao_id":4,
+    #                 "status_id":7,
+    #                 "pontos_num":9.6,
+    #                 "preco_num":18.06,
+    #                 "variacao_num":0.07,
+    #                 "media_num":6.65,
+    #                 "jogos_num":8,
+    #                 "scout":{"A":1,"CA":1,"FC":10,"FD":12,"FF":6,"FS":16,"G":4,"I":2,"PE":34,"RB":6}
+    #             },
+    #             {
+    #                 "nome":"Fábio Santos Romeu",
+    #                 "apelido":"Fábio Santos",
+    #                 "foto":"https://s.glbimg.com/es/sde/f/2017/04/03/513ae4d7abe5f2024ee9a5cfa9c87bd4_FORMATO.png",
+    #                 "atleta_id":38229,
+    #                 "rodada_id":11,
+    #                 "clube_id":282,
+    #                 "posicao_id":2,
+    #                 "status_id":7,
+    #                 "pontos_num":0.1,
+    #                 "preco_num":1.72,
+    #                 "variacao_num":-0.09,
+    #                 "media_num":0.82,
+    #                 "jogos_num":9,
+    #                 "scout":{"CA":4,"FC":12,"FF":3,"FS":16,"I":2,"PE":32,"RB":7,"SG":2}
+    #             }],
+    #         "clubes":{
+    #             "262":{
+    #                 "id":262,
+    #                 "nome":"Flamengo",
+    #                 "abreviacao":"FLA",
+    #                 "posicao":3,
+    #                 "escudos":{
+    #                     "60x60":"https://s.glbimg.com/es/sde/f/equipes/2014/04/14/flamengo_60x60.png",
+    #                     "45x45":"https://s.glbimg.com/es/sde/f/equipes/2013/12/16/flamengo_45x45.png",
+    #                     "30x30":"https://s.glbimg.com/es/sde/f/equipes/2013/12/16/flamengo_30x30.png"}},
+    #             "263":{
+    #                 "id":263,
+    #                 "nome":"Botafogo",
+    #                 "abreviacao":"BOT",
+    #                 "posicao":10,
+    #                 "escudos":{
+    #                     "60x60":"https://s.glbimg.com/es/sde/f/equipes/2014/04/14/botafogo_60x60.png",
+    #                     "45x45":"https://s.glbimg.com/es/sde/f/equipes/2013/12/16/botafogo_45x45.png",
+    #                     "30x30":"https://s.glbimg.com/es/sde/f/equipes/2013/12/16/botafogo_30x30.png"}}},
+    #         "posicoes":{
+    #             "1":{"id":1,"nome":"Goleiro","abreviacao":"gol"},
+    #             "2":{"id":2,"nome":"Lateral","abreviacao":"lat"},
+    #             "3":{"id":3,"nome":"Zagueiro","abreviacao":"zag"},
+    #             "4":{"id":4,"nome":"Meia","abreviacao":"mei"},
+    #             "5":{"id":5,"nome":"Atacante","abreviacao":"ata"},
+    #             "6":{"id":6,"nome":"Técnico","abreviacao":"tec"}},
+    #         "status":{
+    #             "2":{"id":2,"nome":"Dúvida"},
+    #             "3":{"id":3,"nome":"Suspenso"},
+    #             "5":{"id":5,"nome":"Contundido"},
+    #             "6":{"id":6,"nome":"Nulo"},
+    #             "7":{"id":7,"nome":"Provável"}}}
+
+    #     expected_output = [
+    #         Clube(262, "Flamengo", "FLA"),
+    #         Clube(263, "Botafogo", "BOT")
+    #     ]
+    #     mock_get.return_value = expected_response
+    #     expected_url = 'https://api.cartolafc.globo.com/atletas/mercado'
+
+    #     output = self.client.clubes()
+
+    #     mock_get.assert_called_once_with(expected_url)
+    #     self.assertEqual(1, mock_get.call_count)
+    #     self.assertEqual(output, expected_output)
 
 
 
