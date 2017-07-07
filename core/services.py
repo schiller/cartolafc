@@ -57,6 +57,9 @@ class CartolafcAPIClient():
         return clube_list
 
 
+    # 'X-GLB-Token'
+
+
 # Url's da API obtidas do site oficial do CartolaFC 2017.
 
 # amigos_cartola: "//api.cartolafc.globo.com/auth/amigos",
