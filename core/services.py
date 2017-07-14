@@ -45,6 +45,7 @@ class CartolafcAPIClient():
         return r.json()['glbId']
 
     def clubes(self):
+        # TODO: usar partidas para popular clubes (so clubes que importam)
         url = '{}clubes'.format(self.base_url)
         response = self._get(url)
 
