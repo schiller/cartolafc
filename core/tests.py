@@ -199,31 +199,36 @@ class ServicesTests(TestCase):
         CartolafcAPIClient.
         """
         expected_response = {
-            "262": {
-                "id": 262,
-                "nome": "Flamengo",
-                "abreviacao": "FLA",
-                "posicao": 3,
-                "escudos": {
-                    "60x60": "https://s.glbimg.com/es/sde/f/equipes/2014/04/14/flamengo_60x60.png",
-                    "45x45": "https://s.glbimg.com/es/sde/f/equipes/2013/12/16/flamengo_45x45.png",
-                    "30x30": "https://s.glbimg.com/es/sde/f/equipes/2013/12/16/flamengo_30x30.png"}},
-            "263": {
-                "id": 263,
-                "nome": "Botafogo",
-                "abreviacao": "BOT",
-                "posicao": 7,
-                "escudos": {
-                    "60x60": "https://s.glbimg.com/es/sde/f/equipes/2014/04/14/botafogo_60x60.png",
-                    "45x45": "https://s.glbimg.com/es/sde/f/equipes/2013/12/16/botafogo_45x45.png",
-                    "30x30": "https://s.glbimg.com/es/sde/f/equipes/2013/12/16/botafogo_30x30.png"}}
-        }
+            "clubes": {
+                "262": {
+                    "id": 262,
+                    "nome": "Flamengo",
+                    "abreviacao": "FLA",
+                    "posicao": 3,
+                    "escudos": {
+                        "60x60": "https://s.glbimg.com/es/sde/f/equipes/2014/04/14/flamengo_60x60.png",
+                        "45x45": "https://s.glbimg.com/es/sde/f/equipes/2013/12/16/flamengo_45x45.png",
+                        "30x30": "https://s.glbimg.com/es/sde/f/equipes/2013/12/16/flamengo_30x30.png"}},
+                "263": {
+                    "id": 263,
+                    "nome": "Botafogo",
+                    "abreviacao": "BOT",
+                    "posicao": 7,
+                    "escudos": {
+                        "60x60": "https://s.glbimg.com/es/sde/f/equipes/2014/04/14/botafogo_60x60.png",
+                        "45x45": "https://s.glbimg.com/es/sde/f/equipes/2013/12/16/botafogo_45x45.png",
+                        "30x30": "https://s.glbimg.com/es/sde/f/equipes/2013/12/16/botafogo_30x30.png"}}}}
         expected_output = [
-            Clube(262, "Flamengo", "FLA"),
-            Clube(263, "Botafogo", "BOT")
-        ]
+            Clube(262, "Flamengo", "FLA",
+                  "https://s.glbimg.com/es/sde/f/equipes/2013/12/16/flamengo_30x30.png",
+                  "https://s.glbimg.com/es/sde/f/equipes/2013/12/16/flamengo_45x45.png",
+                  "https://s.glbimg.com/es/sde/f/equipes/2014/04/14/flamengo_60x60.png"),
+            Clube(263, "Botafogo", "BOT",
+                  "https://s.glbimg.com/es/sde/f/equipes/2013/12/16/botafogo_30x30.png",
+                  "https://s.glbimg.com/es/sde/f/equipes/2013/12/16/botafogo_45x45.png",
+                  "https://s.glbimg.com/es/sde/f/equipes/2014/04/14/botafogo_60x60.png")]
         mock_get.return_value = expected_response
-        expected_url = 'https://api.cartolafc.globo.com/clubes'
+        expected_url = 'https://api.cartolafc.globo.com/partidas/0'
 
         output = self.client.clubes()
 
