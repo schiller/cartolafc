@@ -194,10 +194,8 @@ class ServicesTests(TestCase):
 
     @mock.patch('core.services.CartolafcAPIClient._get')
     def test_clubes(self, mock_get):
-        """
-        Test getting a list of Clube from the clubes method of
-        CartolafcAPIClient.
-        """
+        """ Test getting a list of Clube from the clubes method of
+        CartolafcAPIClient. """
         expected_response = {
             "clubes": {
                 "262": {
@@ -228,13 +226,19 @@ class ServicesTests(TestCase):
                   "https://s.glbimg.com/es/sde/f/equipes/2013/12/16/botafogo_45x45.png",
                   "https://s.glbimg.com/es/sde/f/equipes/2014/04/14/botafogo_60x60.png")]
         mock_get.return_value = expected_response
-        expected_url = 'https://api.cartolafc.globo.com/partidas/0'
+        expected_url = 'https://api.cartolafc.globo.com/partidas/1'
 
         output = self.client.clubes()
 
         mock_get.assert_called_once_with(expected_url)
         self.assertEqual(1, mock_get.call_count)
         self.assertEqual(output, expected_output)
+
+    @mock.patch('core.services.CartolafcAPIClient._get')
+    def test_partidas(self, mock_get):
+        """ Tests getting a list of Partida from the partidas method of
+        CartolafcAPIClient."""
+        pass
 
     # @mock.patch('core.services.CartolafcAPIClient._get')
     # def test_mercado(self, mock_get):

@@ -45,17 +45,26 @@ class CartolafcAPIClient():
         return r.json()['glbId']
 
     def clubes(self):
-        # TODO: usar partidas para popular clubes (so clubes que importam)
-        url = '{}clubes'.format(self.base_url)
+        url = '{}partidas/1'.format(self.base_url)
         response = self._get(url)
-
+        print(response)
+        response_clubes = response["clubes"]
         clube_list = []
-        for key in response:
-            value = response[key]
-            clube = Clube(value["id"], value["nome"], value["abreviacao"])
+        for key in response_clubes:
+            print(key)
+            clube_json = response_clubes[key]
+            clube = Clube(
+                id=clube_json["id"],
+                nome=clube_json["nome"],
+                abreviacao=clube_json["abreviacao"],
+                escudo_30x30=clube_json["escudos"]["30x30"],
+                escudo_45x45=clube_json["escudos"]["45x45"],
+                escudo_60x60=clube_json["escudos"]["60x60"])
             clube_list.append(clube)
-
         return clube_list
+
+    def partidas(self, rodada):
+        return None
 
 
     # 'X-GLB-Token'
@@ -64,7 +73,6 @@ class CartolafcAPIClient():
 
 ## BEING USED
 # mercado: "//api.cartolafc.globo.com/atletas/mercado",
-# clubes: "//api.cartolafc.globo.com/clubes",
 # partidas: "//api.cartolafc.globo.com/partidas/{rodada}",
 
 ## AUTH
@@ -96,6 +104,7 @@ class CartolafcAPIClient():
 # validarAssinaturaUsuarioSemTime: "//api.cartolafc.globo.com/logged/time/validar-pro",
 
 ## OTHER
+# clubes: "//api.cartolafc.globo.com/clubes",
 # atletas_parciais: "//api.cartolafc.globo.com/atletas/pontuados",
 # busca_ligas: "//api.cartolafc.globo.com/ligas?q=",
 # busca_times: "//api.cartolafc.globo.com/times?q=",
