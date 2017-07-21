@@ -25,13 +25,13 @@ class Clube(models.Model):
 class Partida(models.Model):
     """ Match """
     def __init__(self,
-                 clube_casa_id, clube_visitante_id,
+                 clube_casa, clube_visitante,
                  clube_casa_posicao, clube_visitante_posicao,
                  aproveitamento_mandante, aproveitamento_visitante,
                  placar_oficial_mandante, placar_oficial_visitante,
                  partida_data, local, valida, url_confronto):
-        self.clube_casa = clube_casa_id !!
-        self.clube_visitante = clube_visitante_id
+        self.clube_casa = clube_casa
+        self.clube_visitante = clube_visitante
         self.clube_casa_posicao = clube_casa_posicao
         self.clube_visitante_posicao = clube_visitante_posicao
         self.aproveitamento_mandante = aproveitamento_mandante
@@ -45,10 +45,10 @@ class Partida(models.Model):
 
     clube_casa = models.ForeignKey(Clube,
                                    on_delete=models.CASCADE,
-                                   related_name='partida_casa')
+                                   related_name='partidas_casa')
     clube_visitante = models.ForeignKey(Clube,
                                         on_delete=models.CASCADE,
-                                        related_name='partida_visitante')
+                                        related_name='partidas_visitante')
     clube_casa_posicao = models.IntegerField()
     clube_visitante_posicao = models.IntegerField()
     aproveitamento_mandante = models.CharField(max_length=5)
