@@ -1,5 +1,6 @@
 import requests
-from core.models import Clube
+from datetime import datetime
+from core.models import Clube, Partida
 
 
 class CartolafcAPIClient():
@@ -45,13 +46,12 @@ class CartolafcAPIClient():
         return r.json()['glbId']
 
     def clubes(self):
+        """Retrieves a list of Clube from the CartolaFC API"""
         url = '{}partidas/1'.format(self.base_url)
         response = self._get(url)
-        print(response)
         response_clubes = response["clubes"]
         clube_list = []
         for key in response_clubes:
-            print(key)
             clube_json = response_clubes[key]
             clube = Clube(
                 id=clube_json["id"],
@@ -64,54 +64,35 @@ class CartolafcAPIClient():
         return clube_list
 
     def partidas(self, rodada):
-        return None
+        """Retrieves a list of Partida from the CartolaFC API"""
+        url = '{}partidas/{}'.format(self.base_url, rodada)
+        response = self._get(url)
+        rodada = response['rodada']
+        partida_list_json = response['partidas']
+        partida_list = []
+        for partida_json in partida_list_json:
+            clube_casa_id = partida_json['clube_casa_id']
+            clube_visitante_id = partida_json['clube_visitante_id']
+            clube_casa = Clube.objects.get(pk=clube_casa_id)
+            clube_visitante = Clube.objects.get(pk=clube_visitante_id)
+            partida_data = datetime.strptime(partida_json['partida_data'],
+                                             '%Y-%m-%d %H:%M:%S')
+            partida = Partida(
+                clube_casa=clube_casa,
+                clube_visitante=clube_visitante,
+                clube_casa_posicao=partida_json['clube_casa_posicao'],
+                clube_visitante_posicao=partida_json['clube_visitante_posicao'],
+                aproveitamento_mandante=''.join(partida_json['aproveitamento_mandante']),
+                aproveitamento_visitante=''.join(partida_json['aproveitamento_visitante']),
+                placar_oficial_mandante=partida_json['placar_oficial_mandante'],
+                placar_oficial_visitante=partida_json['placar_oficial_visitante'],
+                partida_data=partida_data,
+                local=partida_json['local'],
+                valida=partida_json['valida'],
+                url_confronto=partida_json['url_confronto'],
+                rodada=rodada)
+            partida_list.append(partida)
+        return partida_list
 
 
     # 'X-GLB-Token'
-
-## Url's da API obtidas do site oficial do CartolaFC 2017.
-
-## BEING USED
-# mercado: "//api.cartolafc.globo.com/atletas/mercado",
-# partidas: "//api.cartolafc.globo.com/partidas/{rodada}",
-
-## AUTH
-# auth: "//api.cartolafc.globo.com/auth/time/info",
-# amigos_cartola: "//api.cartolafc.globo.com/auth/amigos",
-# atleta_pontuacao: "//api.cartolafc.globo.com/auth/mercado/atleta/{idAtleta}/pontuacao",
-# banir_times: "//api.cartolafc.globo.com/auth/liga/{slugLiga}/banir",
-# clear_cartoleiro_pro: "//api.cartolafc.globo.com/auth/time/pro",
-# convidar_times: "//api.cartolafc.globo.com/auth/liga/{slugLiga}/convidar",
-# convite: "//api.cartolafc.globo.com/auth/mensagem/{id}/",
-# historico_transacoes: "//api.cartolafc.globo.com/auth/time/historico/",
-# liga: "//api.cartolafc.globo.com/auth/liga/{slug}",
-# liga_associacao: "//api.cartolafc.globo.com/auth/liga/{slug}/associacao",
-# liga_criar: "//api.cartolafc.globo.com/auth/liga/criar",
-# ligas_do_usuario: "//api.cartolafc.globo.com/auth/ligas",
-# noticias: "//api.cartolafc.globo.com/auth/noticias",
-# performance_time: "//api.cartolafc.globo.com/auth/stats/historico",
-# reativar_ligas_acao: "//api.cartolafc.globo.com/auth/reativar/liga/{slug}",
-# reativar_ligas: "//api.cartolafc.globo.com/auth/reativar/ligas",
-# salvarTime: "//api.cartolafc.globo.com/auth/time/salvar",
-# time: "//api.cartolafc.globo.com/auth/time",
-
-## LOGGED
-# campeoes_ligas_nacionais: "//api.cartolafc.globo.com/logged/ligas/campeoes-nacionais",
-# check_slug_time: "//api.cartolafc.globo.com/logged/time/?search=",
-# check_slug_liga: "//api.cartolafc.globo.com/logged/liga/?search=",
-# criar_time: "//api.cartolafc.globo.com/logged/time/criar",
-# performance_atletas: "//api.cartolafc.globo.com/logged/stats/atletas",
-# validarAssinaturaUsuarioSemTime: "//api.cartolafc.globo.com/logged/time/validar-pro",
-
-## OTHER
-# clubes: "//api.cartolafc.globo.com/clubes",
-# atletas_parciais: "//api.cartolafc.globo.com/atletas/pontuados",
-# busca_ligas: "//api.cartolafc.globo.com/ligas?q=",
-# busca_times: "//api.cartolafc.globo.com/times?q=",
-# ligasPatrocinadores: "//api.cartolafc.globo.com/patrocinadores",
-# mercado_destaques: "//api.cartolafc.globo.com/mercado/destaques",
-# posrodada_destaques: "//api.cartolafc.globo.com/pos-rodada/destaques",
-# rodadas: "//api.cartolafc.globo.com/rodadas",
-# status_mercado: "//api.cartolafc.globo.com/mercado/status",
-# time_adv: "//api.cartolafc.globo.com/time/slug/{slug}/{rodada}", // opcionalmente aceita a rodada
-# time_id: "//api.cartolafc.globo.com/time/id/{id}/{rodada}" // opcionalmente aceita a rodada
