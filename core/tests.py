@@ -2,7 +2,7 @@ import requests
 from datetime import datetime
 from django.test import TestCase, mock
 from core.services import CartolafcAPIClient
-from core.models import Clube, Partida
+from core.models import Clube, Partida, Atleta
 
 
 class CustomHTTPException(Exception):
@@ -288,3 +288,38 @@ class ServicesTests(TestCase):
         self.assertEqual(output[0].clube_casa, expected_output[0].clube_casa)
         self.assertEqual(output[0].partida_data,
                          expected_output[0].partida_data)
+
+    @mock.patch('core.services.CartolafcAPIClient._get')
+    def test_atletas(self, mock_get):
+        """Test getting a list of Atleta from the atletas method of
+        CartolafcAPIClient."""
+        expected_response = {"atletas": [{
+            "nome": "Rodrigo Baldasso da Costa",
+            "apelido": "Rodrigo",
+            "foto": "https://s.glbimg.com/es/sde/f/2017/06/13/a5cb57a41ef2b2308c98b76ba24b430a_FORMATO.png",
+            "atleta_id": 37644,
+            "rodada_id": 12,
+            "clube_id": 303,
+            "posicao_id": 3,
+            "status_id": 2,
+            "pontos_num": 5.2,
+            "preco_num": 9.04,
+            "variacao_num": 1.31,
+            "media_num": 3.17,
+            "jogos_num": 8,
+            "scout": {
+                "CA": 2, "CV": 1, "FC": 5, "FD": 2, "FF": 5, "FS": 15, "I": 1,
+                "PE": 14, "RB": 8, "SG": 3}}]}
+
+        expected_output = [Atleta(
+            id=37644, nome='Rodrigo Baldasso da Costa', apelido='Rodrigo',
+            foto='https://s.glbimg.com/es/sde/f/2017/06/13/a5cb57a41ef2b2308c98b76ba24b430a_FORMATO.png')]
+
+        mock_get.return_value = expected_response
+        expected_url = 'https://api.cartolafc.globo.com/atletas/mercado'
+
+        output = self.client.atletas()
+
+        mock_get.assert_called_once_with(expected_url)
+        self.assertEqual(1, mock_get.call_count)
+        self.assertEqual(output, expected_output)

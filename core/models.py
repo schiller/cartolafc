@@ -2,7 +2,7 @@ from django.db import models
 
 
 class Clube(models.Model):
-    """ Club """
+    """Club"""
     id = models.IntegerField(primary_key=True)
     nome = models.CharField(max_length=200)
     abreviacao = models.CharField(max_length=3)
@@ -15,7 +15,7 @@ class Clube(models.Model):
 
 
 class Partida(models.Model):
-    """ Match """
+    """Match between two Clube"""
     clube_casa = models.ForeignKey(
         Clube, on_delete=models.CASCADE, related_name='partidas_casa')
     clube_visitante = models.ForeignKey(
@@ -36,3 +36,33 @@ class Partida(models.Model):
         return '{} x {}, {}'.format(self.clube_casa,
                                     self.clube_visitante,
                                     self.partida_data)
+
+
+class Atleta(models.Model):
+    """Athlete - player or coach"""
+    id = models.IntegerField(primary_key=True)
+    nome = models.CharField(max_length=200)
+    apelido = models.CharField(max_length=200)
+    foto = models.URLField()
+
+    def __str__(self):
+        return self.apelido
+
+
+class Posicao(models.Model):
+    """Tactical position of an Atleta"""
+    id = models.IntegerField(primary_key=True)
+    nome = models.CharField(max_length=20)
+    abreviacao = models.CharField(max_length=3)
+
+    def __str__(self):
+        return self.nome
+
+
+class Status(models.Model):
+    """Probable status of an Atleta for the next round"""
+    id = models.IntegerField(primary_key=True)
+    nome = models.CharField(max_length=20)
+
+    def __str__(self):
+        return self.nome

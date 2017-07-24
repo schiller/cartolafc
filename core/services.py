@@ -1,6 +1,6 @@
 import requests
 from datetime import datetime
-from core.models import Clube, Partida
+from core.models import Clube, Partida, Atleta
 
 
 class CartolafcAPIClient():
@@ -94,5 +94,17 @@ class CartolafcAPIClient():
             partida_list.append(partida)
         return partida_list
 
-
-    # 'X-GLB-Token'
+    def atletas(self):
+        """Retrieves a list of Atleta from the CartolaFC API"""
+        url = '{}atletas/mercado'.format(self.base_url)
+        response = self._get(url)
+        atleta_list_json = response['atletas']
+        atleta_list = []
+        for atleta_json in atleta_list_json:
+            atleta = Atleta(
+                id=atleta_json['atleta_id'],
+                nome=atleta_json['nome'],
+                apelido=atleta_json['apelido'],
+                foto=atleta_json['foto'])
+            atleta_list.append(atleta)
+        return atleta_list
