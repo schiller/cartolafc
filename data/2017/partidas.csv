@@ -149,13 +149,23 @@
 15,287,284,19,2,"evddd","ddvvv",1.0,3.0,"2017-07-19 19:30:00","Barradão",True
 15,303,294,14,13,"edddv","edvdd",4.0,0.0,"2017-07-19 21:00:00","Moisés Lucarelli",True
 15,314,264,18,1,"evdee","vvvee",0.0,0.0,"2017-07-19 21:00:00","Ressacada",True
-16,266,264,9,1,"eedve","vvvee","","","2017-07-23 16:00:00","Maracanã",True
-16,262,294,4,13,"vvdee","edvdd","","","2017-07-22 19:00:00","Luso-Brasileiro",True
-16,277,265,3,12,"evvev","eevev","","","2017-07-23 11:00:00","Pacaembu",True
-16,276,284,17,2,"ddedv","ddvvv","","","2017-07-24 20:00:00","Morumbi",True
-16,282,267,11,10,"vedvd","edved","","","2017-07-23 19:00:00","Independência",True
-16,293,303,16,14,"dedee","edddv","","","2017-07-23 19:00:00","Arena da Baixada",True
-16,292,275,5,6,"vvvdv","vddve","","","2017-07-23 16:00:00","Arena de Pernambuco",True
-16,287,315,19,15,"evddd","eedvd","","","2017-07-22 16:00:00","Barradão",True
-16,373,263,20,7,"ededd","devve","","","2017-07-23 19:00:00","Olímpico (GO)",True
-16,314,283,18,8,"evdee","dvvee","","","2017-07-23 16:00:00","Ressacada",True
+16,266,264,12,1,"edved","vveev",0.0,1.0,"2017-07-23 16:00:00","Maracanã",True
+16,262,294,4,15,"vdeev","dvddd",2.0,1.0,"2017-07-22 19:00:00","Luso-Brasileiro",True
+16,277,265,3,14,"vvevv","evevd",3.0,0.0,"2017-07-23 11:00:00","Pacaembu",True
+16,276,284,18,2,"dedve","dvvve",1.0,1.0,"2017-07-24 20:00:00","Morumbi",True
+16,282,267,13,8,"edvdd","dvedv",1.0,2.0,"2017-07-23 19:00:00","Independência",True
+16,293,303,16,10,"edeed","dddvv",0.0,2.0,"2017-07-23 19:00:00","Arena da Baixada",True
+16,292,275,6,5,"vvdvd","ddvev",0.0,2.0,"2017-07-23 16:00:00","Arena de Pernambuco",True
+16,287,315,19,11,"vdddd","edvdv",1.0,2.0,"2017-07-22 16:00:00","Barradão",True
+16,373,263,20,7,"dedde","evvee",1.0,1.0,"2017-07-23 19:00:00","Olímpico (GO)",True
+16,314,283,17,9,"vdeev","vveed",1.0,0.0,"2017-07-23 16:00:00","Ressacada",True
+17,263,276,7,18,"evvee","dedve","","","2017-07-29 16:00:00","Engenhão",True
+17,267,293,8,16,"dvedv","edeed","","","2017-07-31 20:00:00","Raulino de Oliveira",True
+17,275,314,5,17,"ddvev","vdeev","","","2017-07-29 19:00:00","Arena Palmeiras",True
+17,264,262,1,4,"vveev","vdeev","","","2017-07-30 16:00:00","Arena Corinthians",True
+17,283,287,9,19,"vveed","vdddd","","","2017-07-30 19:00:00","Mineirão",True
+17,294,282,15,13,"dvddd","edvdd","","","2017-07-30 16:00:00","Couto Pereira",True
+17,284,277,2,3,"dvvve","vvevv","","","2017-07-30 19:00:00","Arena do Grêmio",True
+17,265,292,14,6,"evevd","vvdvd","","","2017-07-30 16:00:00","Fonte Nova",True
+17,303,266,10,12,"dddvv","edved","","","2017-07-30 16:00:00","Moisés Lucarelli",True
+17,315,373,11,20,"edvdv","dedde","","","2017-07-30 11:00:00","Arena Condá",True
