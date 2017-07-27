@@ -137,3 +137,8 @@ class CartolafcAPIClient():
                 nome=status_json['nome'])
             status_list.append(status)
         return status_list
+
+    def scouts(self):
+        """Retrieves a list of Scout from the CartolaFC API"""
+        url = '{}atletas/mercado'.format(self.base_url)
+        pass

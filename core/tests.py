@@ -2,7 +2,7 @@ import requests
 from datetime import datetime
 from django.test import TestCase, mock
 from core.services import CartolafcAPIClient
-from core.models import Clube, Partida, Atleta, Posicao, Status
+from core.models import Clube, Partida, Atleta, Posicao, Status, Scout
 
 
 class CustomHTTPException(Exception):
@@ -26,6 +26,13 @@ class CartolafcAPIClientTests(TestCase):
             escudo_30x30='https://s.glbimg.com/es/sde/f/equipes/2013/12/16/botafogo_30x30.png',
             escudo_45x45='https://s.glbimg.com/es/sde/f/equipes/2013/12/16/botafogo_45x45.png',
             escudo_60x60='https://s.glbimg.com/es/sde/f/equipes/2014/04/14/botafogo_60x60.png')
+        Atleta.objects.create(
+            id=68698,
+            nome='Bruno César Pereira da Silva',
+            apelido='Bruno Silva',
+            foto='https://s.glbimg.com/es/sde/f/2016/05/20/473777983ee50165bf691b0f029cac11_FORMATO.png')
+        Posicao.objects.create(id=4, nome='Meia', abreviacao='mei')
+        Status.objects.create(id=7, nome='Provável')
 
     @mock.patch('core.services.requests.get')
     def test_get(self, mock_get):
@@ -366,3 +373,56 @@ class CartolafcAPIClientTests(TestCase):
         mock_get.assert_called_once_with(expected_url)
         self.assertEqual(1, mock_get.call_count)
         self.assertEqual(output, expected_output)
+
+    @mock.patch('core.services.CartolafcAPIClient._get')
+    def test_scouts(self, mock_get):
+        """Tests getting a list of Scout from the scouts method of
+        CartolafcAPIClient."""
+        expected_response = {"atletas": [{
+            "nome": "Bruno César Pereira da Silva",
+            "apelido": "Bruno Silva",
+            "foto": "https://s.glbimg.com/es/sde/f/2016/05/20/473777983ee50165bf691b0f029cac11_FORMATO.png",
+            "atleta_id": 68698,
+            "rodada_id": 12,
+            "clube_id": 263,
+            "posicao_id": 4,
+            "status_id": 7,
+            "pontos_num": 3.6,
+            "preco_num": 13.04,
+            "variacao_num": 0.46,
+            "media_num": 5.83,
+            "jogos_num": 11,
+            "scout": {
+                "A": 2, "CA": 5, "FC": 18, "FD": 3, "FF": 7, "FS": 19, "G": 4,
+                "PE": 40, "RB": 21}}]}
+
+        atleta = Atleta.objects.get(pk=68698)
+        clube = Clube.objects.get(pk=263)
+        posicao = Posicao.objects.get(pk=4)
+        status = Status.objects.get(pk=7)
+
+        expected_output = [Scout(ano=2017,
+                                 rodada=12,
+                                 atleta=atleta,
+                                 clube=clube,
+                                 posicao=posicao,
+                                 status=status,
+                                 pontos_num=3.6,
+                                 preco_num=13.04,
+                                 variacao_num=0.46,
+                                 media_num = 5.83,
+                                 jogos_num=11,
+                                 A=2, CA=5, FC=18, FD=3, FF=7,
+                                 FS=19, G=4, PE=40, RB=21)]
+
+        expected_url = 'https://api.cartolafc.globo.com/atletas/mercado'
+        mock_get.return_value = expected_response
+
+        output = self.client.scouts()
+
+        mock_get.assert_called_once_with(expected_url)
+        self.assertEqual(1, mock_get.call_count)
+        self.assertEqual(output[0].atleta, expected_output[0].atleta)
+        self.assertEqual(output[0].clube, expected_output[0].clube)
+        self.assertEqual(output[0].posicao, expected_output[0].posicao)
+        self.assertEqual(output[0].status, expected_output[0].status)
