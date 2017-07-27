@@ -15,7 +15,7 @@ class Clube(models.Model):
 
 
 class Partida(models.Model):
-    """Match between two Clube"""
+    """Match between two Clube instances"""
     clube_casa = models.ForeignKey(
         Clube, on_delete=models.CASCADE, related_name='partidas_casa')
     clube_visitante = models.ForeignKey(
@@ -66,3 +66,46 @@ class Status(models.Model):
 
     def __str__(self):
         return self.nome
+
+
+class Pontuacao(models.Model):
+    """Points earned for each scout"""
+    abreviacao = models.CharField(max_length=3)
+    nome = models.CharField(max_length=200)
+    pontuacao = models.IntegerField(default=0)
+
+    def __str__(self):
+        return '{}: {}'.format(self.abreviacao, self.pontuacao)
+
+
+class Scout(models.Model):
+    """Set of scouts of an Athete in one match"""
+    ano = models.IntegerField()
+    rodada = models.IntegerField()
+    atleta = models.ForeignKey(Atleta, on_delete=models.CASCADE)
+    clube = models.ForeignKey(Clube, on_delete=models.CASCADE)
+    posicao = models.ForeignKey(Posicao, on_delete=models.CASCADE)
+    status = models.ForeignKey(Status, on_delete=models.CASCADE)
+    pontos_num = models.FloatField()
+    preco_num = models.FloatField()
+    variacao_num = models.FloatField()
+    media_num = models.FloatField()
+    jogos_num = models.IntegerField(default=0)
+    FS = models.IntegerField(default=0)
+    PE = models.IntegerField(default=0)
+    A = models.IntegerField(default=0)
+    FT = models.IntegerField(default=0)
+    FD = models.IntegerField(default=0)
+    FF = models.IntegerField(default=0)
+    G = models.IntegerField(default=0)
+    I = models.IntegerField(default=0)
+    PP = models.IntegerField(default=0)
+    RB = models.IntegerField(default=0)
+    FC = models.IntegerField(default=0)
+    GC = models.IntegerField(default=0)
+    CA = models.IntegerField(default=0)
+    CV = models.IntegerField(default=0)
+    SG = models.IntegerField(default=0)
+    DD = models.IntegerField(default=0)
+    DP = models.IntegerField(default=0)
+    GS = models.IntegerField(default=0)

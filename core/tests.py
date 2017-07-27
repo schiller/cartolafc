@@ -2,7 +2,7 @@ import requests
 from datetime import datetime
 from django.test import TestCase, mock
 from core.services import CartolafcAPIClient
-from core.models import Clube, Partida, Atleta
+from core.models import Clube, Partida, Atleta, Posicao, Status
 
 
 class CustomHTTPException(Exception):
@@ -13,7 +13,7 @@ class CustomConnException(Exception):
     pass
 
 
-class ServicesTests(TestCase):
+class CartolafcAPIClientTests(TestCase):
     def setUp(self):
         self.client = CartolafcAPIClient()
         Clube.objects.create(
@@ -319,6 +319,49 @@ class ServicesTests(TestCase):
         expected_url = 'https://api.cartolafc.globo.com/atletas/mercado'
 
         output = self.client.atletas()
+
+        mock_get.assert_called_once_with(expected_url)
+        self.assertEqual(1, mock_get.call_count)
+        self.assertEqual(output, expected_output)
+
+
+    @mock.patch('core.services.CartolafcAPIClient._get')
+    def test_posicoes(self, mock_get):
+        """Test getting a list of Posicao from the posicoes method of
+        CartolafcAPIClient."""
+        expected_response = {"posicoes": {
+            "1": {"id": 1, "nome": "Goleiro", "abreviacao": "gol"},
+            "2": {"id": 2, "nome": "Lateral", "abreviacao": "lat"}}}
+
+        expected_output = [
+            Posicao(id=1, nome='Goleiro', abreviacao='gol'),
+            Posicao(id=2, nome='Lateral', abreviacao='lat')]
+
+        mock_get.return_value = expected_response
+        expected_url = 'https://api.cartolafc.globo.com/atletas/mercado'
+
+        output = self.client.posicoes()
+
+        mock_get.assert_called_once_with(expected_url)
+        self.assertEqual(1, mock_get.call_count)
+        self.assertEqual(output, expected_output)
+
+    @mock.patch('core.services.CartolafcAPIClient._get')
+    def test_status(self, mock_get):
+        """Test getting a list of Status from the status method of
+        CartolafcAPIClient."""
+        expected_response = {"status": {
+            "2": {"id": 2, "nome": "Dúvida"},
+            "3": {"id": 3, "nome": "Suspenso"}}}
+
+        expected_output = [
+            Status(id=2, nome='Dúvida'),
+            Status(id=3, nome='Suspenso')]
+
+        mock_get.return_value = expected_response
+        expected_url = 'https://api.cartolafc.globo.com/atletas/mercado'
+
+        output = self.client.status()
 
         mock_get.assert_called_once_with(expected_url)
         self.assertEqual(1, mock_get.call_count)

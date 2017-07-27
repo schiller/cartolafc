@@ -1,6 +1,6 @@
 import requests
 from datetime import datetime
-from core.models import Clube, Partida, Atleta
+from core.models import Clube, Partida, Atleta, Posicao, Status
 
 
 class CartolafcAPIClient():
@@ -108,3 +108,32 @@ class CartolafcAPIClient():
                 foto=atleta_json['foto'])
             atleta_list.append(atleta)
         return atleta_list
+
+    def posicoes(self):
+        """Retrieves a list of Posicao from the CartolaFC API"""
+        url = '{}atletas/mercado'.format(self.base_url)
+        response = self._get(url)
+        posicao_list_json = response['posicoes']
+        posicao_list = []
+        for key in posicao_list_json:
+            posicao_json = posicao_list_json[key]
+            posicao = Posicao(
+                id=posicao_json['id'],
+                nome=posicao_json['nome'],
+                abreviacao=posicao_json['abreviacao'])
+            posicao_list.append(posicao)
+        return posicao_list
+
+    def status(self):
+        """Retrieves a list of Status from the CartolaFC API"""
+        url = '{}atletas/mercado'.format(self.base_url)
+        response = self._get(url)
+        status_list_json = response['status']
+        status_list = []
+        for key in status_list_json:
+            status_json = status_list_json[key]
+            status = Status(
+                id=status_json['id'],
+                nome=status_json['nome'])
+            status_list.append(status)
+        return status_list
