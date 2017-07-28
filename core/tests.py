@@ -1,7 +1,8 @@
 import requests
+import pandas as pd
 from datetime import datetime
 from django.test import TestCase, mock
-from core.services import CartolafcAPIClient
+from core.services import CartolafcAPIClient, CartolaCsvReader
 from core.models import Clube, Partida, Atleta, Posicao, Status, Scout
 
 
@@ -331,7 +332,6 @@ class CartolafcAPIClientTests(TestCase):
         self.assertEqual(1, mock_get.call_count)
         self.assertEqual(output, expected_output)
 
-
     @mock.patch('core.services.CartolafcAPIClient._get')
     def test_posicoes(self, mock_get):
         """Test getting a list of Posicao from the posicoes method of
@@ -410,10 +410,11 @@ class CartolafcAPIClientTests(TestCase):
                                  pontos_num=3.6,
                                  preco_num=13.04,
                                  variacao_num=0.46,
-                                 media_num = 5.83,
+                                 media_num=5.83,
                                  jogos_num=11,
-                                 A=2, CA=5, FC=18, FD=3, FF=7,
-                                 FS=19, G=4, PE=40, RB=21)]
+                                 scouts_A=2, scouts_CA=5, scouts_FC=18,
+                                 scouts_FD=3, scouts_FF=7, scouts_FS=19,
+                                 scouts_G=4, scouts_PE=40, scouts_RB=21)]
 
         expected_url = 'https://api.cartolafc.globo.com/atletas/mercado'
         mock_get.return_value = expected_response
@@ -426,3 +427,50 @@ class CartolafcAPIClientTests(TestCase):
         self.assertEqual(output[0].clube, expected_output[0].clube)
         self.assertEqual(output[0].posicao, expected_output[0].posicao)
         self.assertEqual(output[0].status, expected_output[0].status)
+
+
+class CartolaCsvReaderTests(TestCase):
+    def setUp(self):
+        self.csv_reader = CartolaCsvReader()
+        Clube.objects.create(
+            id=262, nome='Flamengo', abreviacao='FLA',
+            escudo_30x30='https://s.glbimg.com/es/sde/f/equipes/2013/12/16/flamengo_30x30.png',
+            escudo_45x45='https://s.glbimg.com/es/sde/f/equipes/2013/12/16/flamengo_45x45.png',
+            escudo_60x60='https://s.glbimg.com/es/sde/f/equipes/2014/04/14/flamengo_60x60.png')
+        Clube.objects.create(
+            id=263, nome='Botafogo', abreviacao='BOT',
+            escudo_30x30='https://s.glbimg.com/es/sde/f/equipes/2013/12/16/botafogo_30x30.png',
+            escudo_45x45='https://s.glbimg.com/es/sde/f/equipes/2013/12/16/botafogo_45x45.png',
+            escudo_60x60='https://s.glbimg.com/es/sde/f/equipes/2014/04/14/botafogo_60x60.png')
+
+    @mock.patch('core.services.pd.read_csv')
+    def test_partidas(self, mock_read_csv):
+        expected_df = pd.read_csv('/core/sample_csv/partidas.csv')
+
+        clube_casa = Clube.objects.get(pk=262)
+        clube_visitante = Clube.objects.get(pk=263)
+        expected_output = [Partida(
+            clube_casa=clube_casa,
+            clube_visitante=clube_visitante,
+            clube_casa_posicao=4,
+            clube_visitante_posicao=7,
+            aproveitamento_mandante="vdeev",
+            aproveitamento_visitante="evvee",
+            placar_oficial_mandante=0,
+            placar_oficial_visitante=0,
+            partida_data=datetime(year=2017, month=6, day=4, hour=11),
+            local='Raulino de Oliveira',
+            valida=True,
+            url_confronto='http://globoesporte.globo.com/rj/futebol/brasileirao-serie-a/jogo/04-06-2017/flamengo-botafogo',
+            rodada=4)]
+
+        expected_path = 'spam/eggs'
+        mock_read_csv.return_value = expected_df
+
+        output = self.csv_reader.partidas(expected_path)
+
+        mock_read_csv.assert_called_once_with(expected_path)
+        self.assertEqual(1, mock_read_csv.call_count)
+        self.assertEqual(output[0].clube_casa, expected_output[0].clube_casa)
+        self.assertEqual(
+            output[0].partida_data, expected_output[0].partida_data)

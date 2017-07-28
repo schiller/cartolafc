@@ -1,6 +1,7 @@
 import requests
+import pandas as pd
 from datetime import datetime
-from core.models import Clube, Partida, Atleta, Posicao, Status
+from core.models import Clube, Partida, Atleta, Posicao, Status, Scout
 
 
 class CartolafcAPIClient():
@@ -141,4 +142,49 @@ class CartolafcAPIClient():
     def scouts(self):
         """Retrieves a list of Scout from the CartolaFC API"""
         url = '{}atletas/mercado'.format(self.base_url)
+        response = self._get(url)
+        scout_list_json = response['atletas']
+        ano = datetime.now().year
+
+        scout_list = []
+        for scout_json in scout_list_json:
+            atleta_id = scout_json['atleta_id']
+            atleta = Atleta.objects.get(pk=atleta_id)
+            clube_id = scout_json['clube_id']
+            clube = Clube.objects.get(pk=clube_id)
+            posicao_id = scout_json['posicao_id']
+            posicao = Posicao.objects.get(pk=posicao_id)
+            status_id = scout_json['status_id']
+            status = Status.objects.get(pk=status_id)
+            scouts = scout_json['scout']
+            scouts_kwargs = {}
+            for key in scouts:
+                value = scouts[key]
+                arg_name = 'scouts_{}'.format(key)
+                scouts_kwargs[arg_name] = value
+
+            scout = Scout(
+                ano=ano,
+                rodada=scout_json['rodada_id'],
+                atleta=atleta,
+                clube=clube,
+                posicao=posicao,
+                status=status,
+                pontos_num=scout_json['pontos_num'],
+                preco_num=scout_json['preco_num'],
+                variacao_num=scout_json['variacao_num'],
+                media_num=scout_json['media_num'],
+                jogos_num=scout_json['jogos_num'],
+                **scouts_kwargs)
+            scout_list.append(scout)
+
+        return scout_list
+
+
+
+class CartolaCsvReader():
+    """Reads Cartola data from csv and returns Django model instances"""
+
+    def partidas(self, csv_path):
+        partidas_df = pd.read_csv(csv_path)
         pass
