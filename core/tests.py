@@ -1,5 +1,5 @@
 import requests
-import pandas as pd
+import csv
 from datetime import datetime
 from django.test import TestCase, mock
 from core.services import CartolafcAPIClient, CartolaCsvReader
@@ -443,9 +443,11 @@ class CartolaCsvReaderTests(TestCase):
             escudo_45x45='https://s.glbimg.com/es/sde/f/equipes/2013/12/16/botafogo_45x45.png',
             escudo_60x60='https://s.glbimg.com/es/sde/f/equipes/2014/04/14/botafogo_60x60.png')
 
-    @mock.patch('core.services.pd.read_csv')
+    @mock.patch('core.services.csv.reader')
     def test_partidas(self, mock_read_csv):
-        expected_df = pd.read_csv('/core/sample_csv/partidas.csv')
+        csv_path = '/core/sample_csv/partidas.csv'
+        with open(csv_path) as csvfile:
+            expected_reader = csv.reader(csvfile)
 
         clube_casa = Clube.objects.get(pk=262)
         clube_visitante = Clube.objects.get(pk=263)
@@ -465,7 +467,7 @@ class CartolaCsvReaderTests(TestCase):
             rodada=4)]
 
         expected_path = 'spam/eggs'
-        mock_read_csv.return_value = expected_df
+        mock_read_csv.return_value = expected_reader
 
         output = self.csv_reader.partidas(expected_path)
 

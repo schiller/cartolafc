@@ -1,5 +1,5 @@
 import requests
-import pandas as pd
+import csv
 from datetime import datetime
 from core.models import Clube, Partida, Atleta, Posicao, Status, Scout
 
@@ -181,10 +181,11 @@ class CartolafcAPIClient():
         return scout_list
 
 
-
 class CartolaCsvReader():
     """Reads Cartola data from csv and returns Django model instances"""
 
     def partidas(self, csv_path):
-        partidas_df = pd.read_csv(csv_path)
-        pass
+        with open(csv_path) as csvfile:
+            reader = csv.reader(csvfile)
+            for row in reader:
+                print(', '.join(row))
