@@ -1,6 +1,7 @@
 import requests
 import csv
 from datetime import datetime
+from django.db.models import Q
 from core.models import Clube, Partida, Atleta, Posicao, Status, Scout
 
 
@@ -156,6 +157,10 @@ class CartolafcAPIClient():
             posicao = Posicao.objects.get(pk=posicao_id)
             status_id = scout_json['status_id']
             status = Status.objects.get(pk=status_id)
+            rodada = scout_json['rodada_id']
+            partida = Partida.objects.get(
+                Q(partida_data__year=ano, rodada=rodada),
+                Q(clube_casa=clube) | Q(clube_visitante=clube))
             scouts = scout_json['scout']
             scouts_kwargs = {}
             for key in scouts:
@@ -164,12 +169,12 @@ class CartolafcAPIClient():
                 scouts_kwargs[arg_name] = value
 
             scout = Scout(
-                ano=ano,
-                rodada=scout_json['rodada_id'],
+                rodada=rodada,
                 atleta=atleta,
                 clube=clube,
                 posicao=posicao,
                 status=status,
+                partida=partida,
                 pontos_num=scout_json['pontos_num'],
                 preco_num=scout_json['preco_num'],
                 variacao_num=scout_json['variacao_num'],

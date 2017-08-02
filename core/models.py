@@ -80,12 +80,12 @@ class Pontuacao(models.Model):
 
 class Scout(models.Model):
     """Set of scouts of an Athete in one match"""
-    ano = models.IntegerField()
     rodada = models.IntegerField()
     atleta = models.ForeignKey(Atleta, on_delete=models.CASCADE)
     clube = models.ForeignKey(Clube, on_delete=models.CASCADE)
     posicao = models.ForeignKey(Posicao, on_delete=models.CASCADE)
     status = models.ForeignKey(Status, on_delete=models.CASCADE)
+    partida = models.ForeignKey(Partida, on_delete=models.CASCADE)
     pontos_num = models.FloatField(default=0)
     preco_num = models.FloatField(default=0)
     variacao_num = models.FloatField(default=0)
@@ -111,4 +111,7 @@ class Scout(models.Model):
     scouts_GS = models.IntegerField(default=0)
 
     def __str__(self):
-        return '{}-{}: {}'.format(ano, rodada, atleta.apelido)
+        return '{}-{}: {} ({})'.format(self.partida.partida_data.year,
+                                       self.rodada,
+                                       self.atleta.apelido,
+                                       self.clube.abreviacao)

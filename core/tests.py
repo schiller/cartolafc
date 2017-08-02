@@ -2,6 +2,7 @@ import requests
 import csv
 from datetime import datetime
 from django.test import TestCase, mock
+from django.db.models import Q
 from core.services import CartolafcAPIClient, CartolaCsvReader
 from core.models import Clube, Partida, Atleta, Posicao, Status, Scout
 
@@ -17,12 +18,12 @@ class CustomConnException(Exception):
 class CartolafcAPIClientTests(TestCase):
     def setUp(self):
         self.client = CartolafcAPIClient()
-        Clube.objects.create(
+        clube_casa = Clube.objects.create(
             id=262, nome='Flamengo', abreviacao='FLA',
             escudo_30x30='https://s.glbimg.com/es/sde/f/equipes/2013/12/16/flamengo_30x30.png',
             escudo_45x45='https://s.glbimg.com/es/sde/f/equipes/2013/12/16/flamengo_45x45.png',
             escudo_60x60='https://s.glbimg.com/es/sde/f/equipes/2014/04/14/flamengo_60x60.png')
-        Clube.objects.create(
+        clube_visitante = Clube.objects.create(
             id=263, nome='Botafogo', abreviacao='BOT',
             escudo_30x30='https://s.glbimg.com/es/sde/f/equipes/2013/12/16/botafogo_30x30.png',
             escudo_45x45='https://s.glbimg.com/es/sde/f/equipes/2013/12/16/botafogo_45x45.png',
@@ -32,8 +33,22 @@ class CartolafcAPIClientTests(TestCase):
             nome='Bruno César Pereira da Silva',
             apelido='Bruno Silva',
             foto='https://s.glbimg.com/es/sde/f/2016/05/20/473777983ee50165bf691b0f029cac11_FORMATO.png')
+        Partida.objects.create(
+            clube_casa=clube_casa,
+            clube_visitante=clube_visitante,
+            clube_casa_posicao=4,
+            clube_visitante_posicao=7,
+            aproveitamento_mandante="vdeev",
+            aproveitamento_visitante="evvee",
+            placar_oficial_mandante=0,
+            placar_oficial_visitante=0,
+            partida_data=datetime(year=2017, month=6, day=4, hour=11),
+            local='Raulino de Oliveira',
+            valida=True,
+            url_confronto='http://globoesporte.globo.com/rj/futebol/brasileirao-serie-a/jogo/04-06-2017/flamengo-botafogo',
+            rodada=4)
         Posicao.objects.create(id=4, nome='Meia', abreviacao='mei')
-        Status.objects.create(id=7, nome='Provável')
+        Status.objects.create(id=3, nome='Suspenso')
 
     @mock.patch('core.services.requests.get')
     def test_get(self, mock_get):
@@ -263,28 +278,24 @@ class CartolafcAPIClientTests(TestCase):
                 'valida': True,
                 'url_confronto': 'http://globoesporte.globo.com/rj/futebol/brasileirao-serie-a/jogo/04-06-2017/flamengo-botafogo',
                 'url_transmissao': ''}],
-            "rodada": 4
-        }
+            "rodada": 4}
 
         clube_casa = Clube.objects.get(pk=262)
         clube_visitante = Clube.objects.get(pk=263)
-        expected_output = [
-            Partida(
-                clube_casa=clube_casa,
-                clube_visitante=clube_visitante,
-                clube_casa_posicao=4,
-                clube_visitante_posicao=7,
-                aproveitamento_mandante="vdeev",
-                aproveitamento_visitante="evvee",
-                placar_oficial_mandante=0,
-                placar_oficial_visitante=0,
-                partida_data=datetime(year=2017, month=6, day=4, hour=11),
-                local='Raulino de Oliveira',
-                valida=True,
-                url_confronto='http://globoesporte.globo.com/rj/futebol/brasileirao-serie-a/jogo/04-06-2017/flamengo-botafogo',
-                rodada=4
-            )
-        ]
+        expected_output = [Partida(
+            clube_casa=clube_casa,
+            clube_visitante=clube_visitante,
+            clube_casa_posicao=4,
+            clube_visitante_posicao=7,
+            aproveitamento_mandante="vdeev",
+            aproveitamento_visitante="evvee",
+            placar_oficial_mandante=0,
+            placar_oficial_visitante=0,
+            partida_data=datetime(year=2017, month=6, day=4, hour=11),
+            local='Raulino de Oliveira',
+            valida=True,
+            url_confronto='http://globoesporte.globo.com/rj/futebol/brasileirao-serie-a/jogo/04-06-2017/flamengo-botafogo',
+            rodada=4)]
 
         expected_url = 'https://api.cartolafc.globo.com/partidas/4'
         mock_get.return_value = expected_response
@@ -383,38 +394,44 @@ class CartolafcAPIClientTests(TestCase):
             "apelido": "Bruno Silva",
             "foto": "https://s.glbimg.com/es/sde/f/2016/05/20/473777983ee50165bf691b0f029cac11_FORMATO.png",
             "atleta_id": 68698,
-            "rodada_id": 12,
+            "rodada_id": 4,
             "clube_id": 263,
             "posicao_id": 4,
-            "status_id": 7,
-            "pontos_num": 3.6,
-            "preco_num": 13.04,
-            "variacao_num": 0.46,
-            "media_num": 5.83,
-            "jogos_num": 11,
+            "status_id": 3,
+            "pontos_num": 0.7,
+            "preco_num": 11.0,
+            "variacao_num": -1.0,
+            "media_num": 5.97,
+            "jogos_num": 4,
             "scout": {
-                "A": 2, "CA": 5, "FC": 18, "FD": 3, "FF": 7, "FS": 19, "G": 4,
-                "PE": 40, "RB": 21}}]}
+                "CA": 3, "FC": 8, "FD": 1, "FF": 1,
+                "FS": 8, "G": 2, "PE": 16, "RB": 10}}]}
+
 
         atleta = Atleta.objects.get(pk=68698)
         clube = Clube.objects.get(pk=263)
         posicao = Posicao.objects.get(pk=4)
-        status = Status.objects.get(pk=7)
+        status = Status.objects.get(pk=3)
+        partida = Partida.objects.filter(
+            partida_data__year=2017, rodada=4).first()
+        partida = Partida.objects.get(
+            Q(partida_data__year=2017, rodada=4),
+            Q(clube_casa=clube) | Q(clube_visitante=clube))
 
-        expected_output = [Scout(ano=2017,
-                                 rodada=12,
+        expected_output = [Scout(rodada=4,
                                  atleta=atleta,
                                  clube=clube,
                                  posicao=posicao,
                                  status=status,
-                                 pontos_num=3.6,
-                                 preco_num=13.04,
-                                 variacao_num=0.46,
-                                 media_num=5.83,
-                                 jogos_num=11,
-                                 scouts_A=2, scouts_CA=5, scouts_FC=18,
-                                 scouts_FD=3, scouts_FF=7, scouts_FS=19,
-                                 scouts_G=4, scouts_PE=40, scouts_RB=21)]
+                                 partida=partida,
+                                 pontos_num=0.7,
+                                 preco_num=11.0,
+                                 variacao_num=-1.0,
+                                 media_num=5.97,
+                                 jogos_num=4,
+                                 scouts_CA=3, scouts_FC=8, scouts_FD=1,
+                                 scouts_FF=1, scouts_FS=8, scouts_G=2,
+                                 scouts_PE=16, scouts_RB=10)]
 
         expected_url = 'https://api.cartolafc.globo.com/atletas/mercado'
         mock_get.return_value = expected_response
@@ -427,6 +444,7 @@ class CartolafcAPIClientTests(TestCase):
         self.assertEqual(output[0].clube, expected_output[0].clube)
         self.assertEqual(output[0].posicao, expected_output[0].posicao)
         self.assertEqual(output[0].status, expected_output[0].status)
+        self.assertEqual(output[0].partida, expected_output[0].partida)
 
 
 class CartolaCsvReaderTests(TestCase):
@@ -445,7 +463,7 @@ class CartolaCsvReaderTests(TestCase):
 
     @mock.patch('core.services.csv.reader')
     def test_partidas(self, mock_read_csv):
-        csv_path = '/core/sample_csv/partidas.csv'
+        csv_path = '/sample_csv/partidas.csv'
         with open(csv_path) as csvfile:
             expected_reader = csv.reader(csvfile)
 
@@ -476,3 +494,14 @@ class CartolaCsvReaderTests(TestCase):
         self.assertEqual(output[0].clube_casa, expected_output[0].clube_casa)
         self.assertEqual(
             output[0].partida_data, expected_output[0].partida_data)
+
+
+
+
+
+
+
+
+
+
+
