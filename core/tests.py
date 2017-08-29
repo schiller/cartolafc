@@ -412,8 +412,7 @@ class CartolafcAPIClientTests(TestCase):
         clube = Clube.objects.get(pk=263)
         posicao = Posicao.objects.get(pk=4)
         status = Status.objects.get(pk=3)
-        partida = Partida.objects.filter(
-            partida_data__year=2017, rodada=4).first()
+        # get the Partida instance with the correct year and Clube
         partida = Partida.objects.get(
             Q(partida_data__year=2017, rodada=4),
             Q(clube_casa=clube) | Q(clube_visitante=clube))
